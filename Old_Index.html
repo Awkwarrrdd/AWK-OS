@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classic Tutoring Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 20px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: white;
+            margin-bottom: 12px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            color: rgba(255,255,255,0.9);
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .library-container {
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+            letter-spacing: -0.01em;
+        }
+
+        .game-description {
+            font-size: 1rem;
+            color: #718096;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .library-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .game-card {
+                padding: 24px;
+            }
+
+            .game-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 2rem;
+            }
+
+            .game-title {
+                font-size: 1.2rem;
+            }
+
+            .game-description {
+                font-size: 0.9rem;
+            }
+
+            .play-button {
+                padding: 10px 24px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            }
+
+            .header h1 {
+                color: #63b3ed;
+            }
+
+            .header p {
+                color: #a0aec0;
+            }
+
+            .game-card {
+                background: rgba(45, 55, 72, 0.9);
+                border-color: rgba(255,255,255,0.1);
+            }
+
+            .game-card:hover {
+                border-color: rgba(255,255,255,0.3);
+            }
+
+            .game-icon {
+                background: linear-gradient(135deg, #4299e1, #3182ce);
+            }
+
+            .game-title {
+                color: #e2e8f0;
+            }
+
+            .game-description {
+                color: #a0aec0;
+            }
+
+            .play-button {
+                background: linear-gradient(135deg, #4299e1, #3182ce);
+            }
+
+            .play-button:hover {
+                background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            }
+        }
+
+        .tutoring-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .tutoring-badge {
+                background: rgba(45, 55, 72, 0.95);
+                color: #63b3ed;
+            }
+        }
+
+        .youtube-link {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .youtube-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .youtube-link::before {
+            content: '📺 ';
+            margin-right: 4px;
+        }
+
+        .library-container {
+            max-width: 1400px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.2);
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .game-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .game-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2d3748;
+            letter-spacing: -0.01em;
+        }
+
+        .game-description {
+            font-size: 1rem;
+            color: #718096;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .play-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+            
+            .library-container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .game-card {
+                padding: 24px;
+            }
+
+            .game-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 2rem;
+            }
+
+            .game-title {
+                font-size: 1.2rem;
+            }
+
+            .game-description {
+                font-size: 0.9rem;
+            }
+
+            .play-button {
+                padding: 10px 24px;
+                font-size: 1rem;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            }
+
+            .header h1 {
+                color: #63b3ed;
+            }
+
+            .header p {
+                color: #a0aec0;
+            }
+
+            .game-card {
+                background: rgba(45, 55, 72, 0.9);
+                border-color: rgba(255,255,255,0.1);
+            }
+
+            .game-card:hover {
+                border-color: rgba(255,255,255,0.3);
+            }
+
+            .game-icon {
+                background: linear-gradient(135deg, #4299e1, #3182ce);
+            }
+
+            .game-title {
+                color: #e2e8f0;
+            }
+
+            .game-description {
+                color: #a0aec0;
+            }
+
+            .play-button {
+                background: linear-gradient(135deg, #4299e1, #3182ce);
+            }
+
+            .play-button:hover {
+                background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tutoring-badge">For School Testing</div>
+
+    <div class="header">
+        <h1>Classic Tutoring Hub</h1>
+        <p>Educational tools and interactive learning</p>
+        <a href="https://www.youtube.com/@awkwarrrdd" target="_blank" class="youtube-link">@awkwarrrdd on YT</a>
+    </div>
+
+    <div class="library-container">
+        <div class="game-card" onclick="window.location.href='MinecraftLauncher.html'">
+            <div class="game-icon"><img src="MC.png" alt="Minecraft" style="width:100%;height:100%;object-fit:contain;"></div>
+            <h3 class="game-title">Minecraft Launcher</h3>
+            <p class="game-description">Creative building sandbox</p>
+            <button class="play-button">Launch</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Paint.html'">
+            <div class="game-icon"><img src="MS.png" alt="Paint" style="width:100%;height:100%;object-fit:contain;"></div>
+            <h3 class="game-title">Paint App</h3>
+            <p class="game-description">Digital art canvas</p>
+            <button class="play-button">Paint</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Windows 12.html'">
+            <div class="game-icon">💻</div>
+            <h3 class="game-title">Windows 12</h3>
+            <p class="game-description">Desktop simulation</p>
+            <button class="play-button">Explore</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='simple text editor.html'">
+            <div class="game-icon">📝</div>
+            <h3 class="game-title">Text Editor</h3>
+            <p class="game-description">Simple writing tool</p>
+            <button class="play-button">Edit</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Undertale.html'">
+            <div class="game-icon"><img src="Und.png" alt="Undertale" style="width:100%;height:100%;object-fit:contain;"></div>
+            <h3 class="game-title">Undertale</h3>
+            <p class="game-description">Story adventure</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='SonicMania.html'">
+            <div class="game-icon">💨</div>
+            <h3 class="game-title">Sonic Mania</h3>
+            <p class="game-description">Fast platformer</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='N64 Mario 64.html'">
+            <div class="game-icon">🍄</div>
+            <h3 class="game-title">Super Mario 64</h3>
+            <p class="game-description">Classic 3D platformer</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='BloodMoney.html'">
+            <div class="game-icon">🎯</div>
+            <h3 class="game-title">BloodMoney</h3>
+            <p class="game-description">Strategic action</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='R.E.P.O.html'">
+            <div class="game-icon">👻</div>
+            <h3 class="game-title">R.E.P.O.</h3>
+            <p class="game-description">Cooperative horror</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Half-Half.html'">
+            <div class="game-icon">🔬</div>
+            <h3 class="game-title">Half-Life</h3>
+            <p class="game-description">Classic FPS adventure</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='HallowKnight.html'">
+            <div class="game-icon">🦋</div>
+            <h3 class="game-title">Hollow Knight</h3>
+            <p class="game-description">Metroidvania adventure</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='N64 Zelda Majora\'s Mask.html'">
+            <div class="game-icon">🌙</div>
+            <h3 class="game-title">Zelda: Majora's Mask</h3>
+            <p class="game-description">N64 adventure classic</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Fallout1.html'">
+            <div class="game-icon">⚡</div>
+            <h3 class="game-title">Fallout 1</h3>
+            <p class="game-description">Post-apocalyptic RPG</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Ultrakill.html'">
+            <div class="game-icon">🔫</div>
+            <h3 class="game-title">ULTRAKILL</h3>
+            <p class="game-description">Fast-paced FPS</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Kindergarden.html'">
+            <div class="game-icon">🏫</div>
+            <h3 class="game-title">Kindergarten</h3>
+            <p class="game-description">School adventure</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Kindergarden 2.html'">
+            <div class="game-icon">🏫</div>
+            <h3 class="game-title">Kindergarten 2</h3>
+            <p class="game-description">School sequel</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Kindergarten 3.html'">
+            <div class="game-icon">🏫</div>
+            <h3 class="game-title">Kindergarten 3</h3>
+            <p class="game-description">Latest school game</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Deltarune.html'">
+            <div class="game-icon">🔷</div>
+            <h3 class="game-title">Deltarune</h3>
+            <p class="game-description">Undertale sequel</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='DVD_BOUNCE.html'">
+            <div class="game-icon">📀</div>
+            <h3 class="game-title">DVD Bounce</h3>
+            <p class="game-description">Screen saver</p>
+            <button class="play-button">Watch</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='64.html'">
+            <div class="game-icon">🎮</div>
+            <h3 class="game-title">Super Mario 64</h3>
+            <p class="game-description">N64 classic</p>
+            <button class="play-button">Play</button>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='Mask.html'">
+            <div class="game-icon">🎭</div>
+            <h3 class="game-title">The Mask</h3>
+            <p class="game-description">Comedy adventure</p>
+            <button class="play-button">Play</button>
+        </div>
+    </div>
+</body>
+</html>
+

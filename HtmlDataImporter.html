@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Data Importer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #2d3748;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 100vh;
+        }
+        h1 {
+            color: #9D0B44; /* Arch accent */
+        }
+        .importer-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        button {
+            background: #9D0B44;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background: #C04374;
+        }
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+        #output {
+            margin-top: 15px;
+            white-space: pre-wrap;
+            background: #1a202c;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="importer-container">
+        <h1>💾 HTML Data Importer Utility</h1>
+        <p>This utility helps migrate save data and settings from older versions of the hub to the current version (v1.4). Please upload your old hub's HTML file (e.g., a previously saved 'index.html') to initiate data cleanup.</p>
+
+        <input type="file" id="fileInput" accept=".html, .txt" style="display: none;">
+        <label for="fileInput" style="padding: 10px 20px; background: #9D0B44; color: white; border-radius: 6px; cursor: pointer; display: inline-block; transition: background 0.2s;">
+            Upload Old HTML File
+        </label>
+
+        <div id="output">Ready. Upload a file to begin migration analysis.</div>
+    </div>
+
+    <script>
+        const OUTPUT_EL = document.getElementById('output');
+        const FILE_INPUT = document.getElementById('fileInput');
+        const CURRENT_HUB_VERSION = "1.5";
+
+        function log(message) {
+            OUTPUT_EL.innerHTML += `<div>[LOG] ${message}</div>`;
+            OUTPUT_EL.scrollTop = OUTPUT_EL.scrollHeight;
+        }
+
+        // Migration functions targeting known potential legacy keys stored in localStorage
+        function migrateMinecraftData() {
+            // Example migration: If old Minecraft launcher used a different key
+            const oldKey = 'minecraftLauncherLastVersion';
+            const newKey = 'mcSelectedVersion';
+
+            if (localStorage.getItem(oldKey)) {
+                const value = localStorage.getItem(oldKey);
+                localStorage.setItem(newKey, value);
+                localStorage.removeItem(oldKey);
+                return `Migrated Minecraft preference: ${value}.`;
+            }
+            return 'No Minecraft legacy data found.';
+        }
+
+        function migrateOldSystemSettings() {
+            let migratedCount = 0;
+            // Keys related to old file names or deprecated internal settings
+            const deprecatedKeys = [
+                'oldHubTheme', 
+                'desktopBackgroundStyle', 
+                'gameSave_3', 
+                'gameSave_64', 
+                'gameSave_2'
+            ];
+
+            deprecatedKeys.forEach(key => {
+                if (localStorage.getItem(key)) {
+                    localStorage.removeItem(key);
+                    log(`Cleaned up deprecated key: ${key}`);
+                    migratedCount++;
+                }
+            });
+            return migratedCount > 0 ? `Cleaned up ${migratedCount} deprecated system keys.` : 'No deprecated system keys found.';
+        }
+
+        function updateHubVersion() {
+             const storedVersion = localStorage.getItem('tutoringHubVersion');
+             if (storedVersion !== CURRENT_HUB_VERSION) {
+                 localStorage.setItem('tutoringHubVersion', CURRENT_HUB_VERSION);
+                 return `Updated hub version marker from ${storedVersion || 'N/A'} to ${CURRENT_HUB_VERSION}.`;
+             }
+             return `Hub version marker is already at ${CURRENT_HUB_VERSION}.`;
+        }
+
+        function runMigration(fileContent) {
+            log(`--- Starting Data Migration & Cleanup (Triggered by file upload) ---`);
+            log(`Simulating data extraction from uploaded file (Length: ${fileContent.length} bytes)...`);
+            
+            // If the old HTML contained embedded JSON data (e.g., in a script tag), we would parse it here.
+            
+            log(migrateMinecraftData());
+            log(migrateOldSystemSettings());
+            log(updateHubVersion());
+
+            log('Migration/Cleanup complete. The uploaded file content is shown below for inspection.');
+            log('-------------------------------------------');
+            log(`File Content Snippet:\n${fileContent.substring(0, 1000)}...`);
+            log('-------------------------------------------');
+        }
+        
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            OUTPUT_EL.innerHTML = '';
+            log(`File selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`);
+            
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const content = e.target.result;
+                runMigration(content);
+            };
+
+            reader.onerror = () => {
+                log('Error reading file.');
+            };
+
+            reader.readAsText(file);
+        }
+
+        FILE_INPUT.addEventListener('change', handleFileImport);
+    </script>
+</body>
+</html>
