@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DVD Logo Bounce</title>
+    <style>
+        /* CSS for styling the page and the logo */
+        body {
+            /* Full-screen black background */
+            background-color: black;
+            margin: 0;
+            overflow: hidden; /* Prevent scrollbars from appearing */
+        }
+
+        #dvd-logo {
+            /* The element that will move */
+            position: absolute; /* Allows for absolute positioning and movement */
+            width: 150px; /* Size of the logo */
+            height: 75px;
+            /* Logo text style */
+            font-family: Arial, sans-serif;
+            font-size: 40px;
+            font-weight: bold;
+            color: white; /* Initial color */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px; /* Optional rounded corners */
+            padding: 5px 15px;
+            /* Semi-transparent background for a cleaner look */
+            background-color: rgba(255, 255, 255, 0.1);
+            /* Optional: subtle shadow for depth */
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+
+            /* Initial position (top-left) */
+            left: 0;
+            top: 0;
+            /* Smooth transition for color change */
+            transition: color 0.5s, box-shadow 0.5s;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="dvd-logo">
+        DVD
+    </div>
+
+    <script>
+        // JavaScript for the bouncing logic
+
+        // 1. Get the logo element
+        const logo = document.getElementById('dvd-logo');
+
+        // 2. Define movement variables
+        let x = 0; // Current X position (left)
+        let y = 0; // Current Y position (top)
+        let dx = 2; // Speed and direction on the X-axis (e.g., 2 pixels per frame)
+        let dy = 2; // Speed and direction on the Y-axis
+
+        // Array of colors for the logo to cycle through
+        const colors = [
+            '#FF0000', // Red
+            '#00FF00', // Green
+            '#0000FF', // Blue
+            '#FFFF00', // Yellow
+            '#00FFFF', // Cyan
+            '#FF00FF', // Magenta
+            '#FFFFFF'  // White
+        ];
+        let colorIndex = 0;
+
+        /**
+         * @returns {string} A random color from the colors array.
+         */
+        function getRandomColor() {
+            // Find a new color that is different from the current one
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * colors.length);
+            } while (newIndex === colorIndex);
+            colorIndex = newIndex;
+            return colors[colorIndex];
+        }
+
+        /**
+         * The main animation loop. Runs continuously.
+         */
+        function animate() {
+            // Get the current dimensions of the viewport and the logo
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const logoWidth = logo.offsetWidth;
+            const logoHeight = logo.offsetHeight;
+
+            // 3. Update position
+            x += dx;
+            y += dy;
+
+            // 4. Check for X-axis (left/right) boundary collision
+            if (x + logoWidth >= screenWidth || x <= 0) {
+                // Collision occurred on the right edge or left edge
+
+                // Reverse the X direction
+                dx = -dx;
+
+                // Change the logo color and shadow
+                const newColor = getRandomColor();
+                logo.style.color = newColor;
+                logo.style.boxShadow = `0 0 20px ${newColor}`;
+
+                // Force the logo back into bounds in case it overshot (prevents sticking)
+                if (x < 0) x = 0;
+                if (x + logoWidth > screenWidth) x = screenWidth - logoWidth;
+
+                // Log a bounce for fun
+                console.log(`Bounce X at (${x}, ${y})`);
+            }
+
+            // 5. Check for Y-axis (top/bottom) boundary collision
+            if (y + logoHeight >= screenHeight || y <= 0) {
+                // Collision occurred on the bottom edge or top edge
+
+                // Reverse the Y direction
+                dy = -dy;
+
+                // Change the logo color and shadow
+                const newColor = getRandomColor();
+                logo.style.color = newColor;
+                logo.style.boxShadow = `0 0 20px ${newColor}`;
+
+                // Force the logo back into bounds
+                if (y < 0) y = 0;
+                if (y + logoHeight > screenHeight) y = screenHeight - logoHeight;
+
+                // Log a bounce for fun
+                console.log(`Bounce Y at (${x}, ${y})`);
+            }
+
+            // 6. Apply the new position to the logo element
+            logo.style.left = `${x}px`;
+            logo.style.top = `${y}px`;
+
+            // 7. Request the browser to call 'animate' again for the next frame
+            requestAnimationFrame(animate);
+        }
+
+        // Start the animation loop when the script loads
+        animate();
+
+        // Optional: Re-run the animate loop on window resize to keep it smooth
+        window.addEventListener('resize', () => {
+            // Reset position to center or corner to prevent sticking if resized aggressively
+            // A simple continuous loop is usually sufficient, but this can help recovery.
+        });
+    </script>
+</body>
+</html>s

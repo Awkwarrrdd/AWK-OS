@@ -1,0 +1,266 @@
+<html><head><base href="help"><title>Simple Paint App</title><style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: white;
+    font-family: Arial, sans-serif;
+  }
+  
+  .toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    background: #444;
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  .tool {
+    padding: 8px 15px;
+    background: #666;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tool:hover {
+    background: #777;
+  }
+
+  .tool.active {
+    background: #4CAF50;
+  }
+
+  #colorPicker {
+    width: 50px;
+    height: 34px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .size-slider {
+    width: 100px;
+  }
+
+  canvas {
+    margin-top: 54px;
+  }
+</style></head>
+<body>
+
+<div class="toolbar">
+  <button class="tool active" id="brush">Brush</button>
+  <button class="tool" id="eraser">Eraser</button>
+  <button class="tool" id="pencil">Pencil</button>
+  <button class="tool" id="spray">Spray</button>
+  <button class="tool" id="square">Square</button>
+  <button class="tool" id="circle">Circle</button>
+  <button class="tool" id="line">Line</button>
+  <input type="color" id="colorPicker" value="#000000">
+  <input type="range" class="size-slider" id="sizeSlider" min="1" max="50" value="5">
+  <button class="tool" id="clear">Clear Canvas</button>
+  <button class="tool" id="save">Save</button>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const colorPicker = document.getElementById('colorPicker');
+const sizeSlider = document.getElementById('sizeSlider');
+const brushBtn = document.getElementById('brush');
+const eraserBtn = document.getElementById('eraser');
+const pencilBtn = document.getElementById('pencil');
+const sprayBtn = document.getElementById('spray');
+const squareBtn = document.getElementById('square');
+const circleBtn = document.getElementById('circle');
+const lineBtn = document.getElementById('line');
+const clearBtn = document.getElementById('clear');
+const saveBtn = document.getElementById('save');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - 54;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let isDrawing = false;
+let currentTool = 'brush';
+let lastX = 0;
+let lastY = 0;
+let startX = 0;
+let startY = 0;
+
+function setActiveTool(tool) {
+  currentTool = tool;
+  [brushBtn, eraserBtn, pencilBtn, sprayBtn, squareBtn, circleBtn, lineBtn].forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.getElementById(tool).classList.add('active');
+}
+
+// Tool selection
+brushBtn.addEventListener('click', () => setActiveTool('brush'));
+eraserBtn.addEventListener('click', () => setActiveTool('eraser'));
+pencilBtn.addEventListener('click', () => setActiveTool('pencil'));
+sprayBtn.addEventListener('click', () => setActiveTool('spray'));
+squareBtn.addEventListener('click', () => setActiveTool('square'));
+circleBtn.addEventListener('click', () => setActiveTool('circle'));
+lineBtn.addEventListener('click', () => setActiveTool('line'));
+
+function spray(x, y) {
+  const density = sizeSlider.value;
+  for (let i = 0; i < density * 2; i++) {
+    const offsetX = Math.random() * density * 2 - density;
+    const offsetY = Math.random() * density * 2 - density;
+    ctx.fillStyle = colorPicker.value;
+    ctx.fillRect(x + offsetX, y + offsetY, 1, 1);
+  }
+}
+
+function startDrawing(e) {
+  isDrawing = true;
+  [lastX, lastY] = [e.offsetX, e.offsetY];
+  [startX, startY] = [e.offsetX, e.offsetY];
+  
+  if (currentTool === 'spray') {
+    spray(lastX, lastY);
+  }
+}
+
+function draw(e) {
+  if (!isDrawing) return;
+  
+  const currentX = e.offsetX;
+  const currentY = e.offsetY;
+
+  switch(currentTool) {
+    case 'brush':
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(currentX, currentY);
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizeSlider.value;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+      break;
+      
+    case 'eraser':
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(currentX, currentY);
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = sizeSlider.value;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+      break;
+      
+    case 'pencil':
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(currentX, currentY);
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      break;
+      
+    case 'spray':
+      spray(currentX, currentY);
+      break;
+      
+    case 'square':
+    case 'circle':
+    case 'line':
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCtx.drawImage(canvas, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(tempCanvas, 0, 0);
+      
+      ctx.beginPath();
+      ctx.strokeStyle = colorPicker.value;
+      ctx.lineWidth = sizeSlider.value;
+      
+      if (currentTool === 'square') {
+        ctx.strokeRect(startX, startY, currentX - startX, currentY - startY);
+      } else if (currentTool === 'circle') {
+        const radius = Math.sqrt(Math.pow(currentX - startX, 2) + Math.pow(currentY - startY, 2));
+        ctx.arc(startX, startY, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+      } else if (currentTool === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(currentX, currentY);
+        ctx.stroke();
+      }
+      break;
+  }
+  
+  [lastX, lastY] = [currentX, currentY];
+}
+
+function stopDrawing() {
+  isDrawing = false;
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mouseout', stopDrawing);
+
+clearBtn.addEventListener('click', () => {
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+});
+
+saveBtn.addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'masterpiece.png';
+  link.href = canvas.toDataURL();
+  link.click();
+});
+
+ctx.fillStyle = 'white';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// Touch support
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const mouseEvent = new MouseEvent('mousedown', {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  canvas.dispatchEvent(mouseEvent);
+});
+
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const mouseEvent = new MouseEvent('mousemove', {
+    clientX: touch.clientX,
+    clientY: touch.clientY
+  });
+  canvas.dispatchEvent(mouseEvent);
+});
+
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  const mouseEvent = new MouseEvent('mouseup', {});
+  canvas.dispatchEvent(mouseEvent);
+});
+</script>
+</body></html>
