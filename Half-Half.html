@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Half Life 1 demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="taskmanager.css">
+    <style>
+        /* Ensure the iframe doesn't interfere with taskbar */
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="desktop">
+        <div id="taskbar">
+            <div id="start-button">
+                <img src="start-icon.png" alt="Start" id="start-icon">
+                <span>Start</span>
+            </div>
+            <div id="taskbar-apps"></div>
+            <div id="system-tray">
+                <span id="clock"></span>
+            </div>
+        </div>
+        <div id="start-menu" class="hidden">
+            <div id="start-menu-content">
+                <div id="user-info">
+                    <img src="user-avatar.png" alt="User" id="user-avatar">
+                    <span id="username">User</span>
+                </div>
+                <div id="programs-list">
+                    <div class="program-item" data-app="file-explorer">
+                        <img src="folder-icon.png" alt="File Explorer">
+                        <span>File Explorer</span>
+                    </div>
+                    <div class="program-item" data-app="calculator">
+                        <img src="calculator-icon.png" alt="Calculator">
+                        <span>Calculator</span>
+                    </div>
+                    <div class="program-item" data-app="notepad">
+                        <img src="notepad-icon.png" alt="Notepad">
+                        <span>Notepad</span>
+                    </div>
+                </div>
+                <div id="start-menu-bottom">
+                    <div class="program-item" data-app="settings">
+                        <img src="settings-icon.png" alt="Settings">
+                        <span>Settings</span>
+                    </div>
+                    <div class="program-item" data-app="shutdown">
+                        <img src="shutdown-icon.png" alt="Shutdown">
+                        <span>Shutdown</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="game-container">
+        <iframe src="https://pixelsuft.github.io/hl/xash.html" style="width: 100%; height: 100%; border: none;"></iframe>
+    </div>
+    
+    <script src="taskmanager.js"></script>
+    <script src="desktop.js"></script>
+    <script>
+        // Initialize task manager when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // The task manager will automatically add its toggle button and taskbar
+        });
+    </script>
+</body>
+</html>
