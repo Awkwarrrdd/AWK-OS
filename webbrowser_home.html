@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutoring Hub Home</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937;
+            font-family: sans-serif;
+            text-align: center;
+        }
+        .home-container {
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #9D0B44;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        #homeSearchInput {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        #homeSearchInput:focus {
+            border-color: #9D0B44;
+        }
+        #homeSearchButton {
+            padding: 12px 20px;
+            background-color: #9D0B44;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        #homeSearchButton:hover {
+            background-color: #C04374;
+        }
+        .quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .quick-link {
+            padding: 10px 15px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            text-decoration: none;
+            color: #1f2937;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .quick-link:hover {
+            background: #d1d5db;
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #1f2937;
+                color: #f3f4f6;
+            }
+            .home-container {
+                background: #374151;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            }
+            #homeSearchInput {
+                background: #4b5563;
+                border-color: #4b5563;
+                color: white;
+            }
+            .quick-link {
+                background: #4b5563;
+                color: #f3f4f6;
+            }
+            .quick-link:hover {
+                background: #6b7280;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <h1>Tutoring Hub Browser</h1>
+        <div class="search-form">
+            <input type="text" id="homeSearchInput" placeholder="Search with Bing or enter URL">
+            <button id="homeSearchButton">Search</button>
+        </div>
+        <div class="quick-links">
+            <a href="#" class="quick-link" data-url="https://www.bing.com/">Bing</a>
+            <a href="#" class="quick-link" data-url="https://www.google.com/">Google</a>
+            <a href="#" class="quick-link" data-url="https://en.wikipedia.org/">Wikipedia</a>
+            <a href="#" class="quick-link" data-url="https://www.youtube.com/">YouTube</a>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('homeSearchInput');
+        const searchButton = document.getElementById('homeSearchButton');
+
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (query && window.parent && window.parent.loadUrl) {
+                // Since this iframe is inside webbrowser.html, we call the parent's loadUrl function
+                window.parent.loadUrl(query);
+            }
+        }
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Handle quick links dynamically
+        document.querySelectorAll('.quick-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = link.getAttribute('data-url');
+                if (url && window.parent && window.parent.loadUrl) {
+                    window.parent.loadUrl(url);
+                }
+            });
+        });
+
+        // Expose function for parent to update address bar if needed (e.g., if parent defaults to 'about:blank')
+        if (window.parent && window.parent.updateAddressBar) {
+            window.parent.updateAddressBar(window.location.href);
+        }
+    </script>
+</body>
+</html>

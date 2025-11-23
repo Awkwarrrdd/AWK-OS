@@ -1,0 +1,36 @@
+<script>
+    launch();
+
+    function launch() {
+      try {
+        fetch("https://cdn.jsdelivr.net/gh/regedit-sys/web-port@main/deltarune/free.html?t="+Date.now())
+          .then(response => response.text())
+          .then(html => {
+                document.documentElement.innerHTML = html;
+
+                document.documentElement.querySelectorAll('script').forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src;
+                    } else {
+                        newScript.textContent = oldScript.textContent;
+                    }
+                    document.body.appendChild(newScript);
+                });
+          });
+      } catch (error) {
+        console.error('error:', error);
+      }
+    }
+
+  </script>
+
+            <div style="position:fixed;bottom:10px;right:10px;z-index:9999;">
+                <a href="https://noahs-calculus-tutor.pages.dev" target="_blank" 
+                   style="color:white;text-decoration:none;display:flex;align-items:center;gap:8px;font-size:12px;background:rgba(0,0,0,0.8);padding:8px 12px;border-radius:6px;font-family:Arial,sans-serif;">
+                    <span>Downloaded from Noah's Tutoring Hub</span>
+                    <img src="https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/reimagined-octo-winner@main/pictures/5.png" 
+                         style="height:18px;width:auto;">
+                </a>
+            </div>
+           
